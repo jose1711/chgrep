@@ -1,3 +1,6 @@
+chgrep-1.2.5
+	-modify  so it compiles cleanly with latest gcc
+
 chgrep-1.2.4
 	-added  options:
 	  -d   Don't change modification times of altered files,

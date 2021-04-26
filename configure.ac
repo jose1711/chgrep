@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/chgrep.c)
-AM_INIT_AUTOMAKE(chgrep, 1.2.4)
+AM_INIT_AUTOMAKE(chgrep, 1.2.5)
 
 dnl Checks for programs.
 AC_PROG_CC
