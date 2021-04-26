@@ -27,6 +27,7 @@
 #include        <signal.h>
 #include        "error.h"
 #include        "wrappers.h"
+#include	<stdlib.h>
 
 void
 Close(int fd)

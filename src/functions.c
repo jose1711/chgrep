@@ -29,6 +29,8 @@
 #include	<limits.h>
 #include	<dirent.h>
 #include	"ftw.h"
+#include	"error.h"
+#include	<stdlib.h>
 
 #define		MAXLINE	4096
 #define		PERM	0666
@@ -65,8 +67,8 @@ Copy_ch_file(const char *file, const char *tmpfile, regex_t *oldstring, char *ne
 	char		*tmp;
 	regmatch_t	pmatch[512];
 
-	buffin = (char *) Malloc(BUFSIZ);
-	buffout = (char *) Malloc(BUFSIZ * 5);
+	buffin = (char *) malloc(BUFSIZ);
+	buffout = (char *) malloc(BUFSIZ * 5);
 	mem_al = BUFSIZ * 5;
 	file_quit = (char *) tmpfile;
 	tmpfile_quit = (char *) file;
@@ -88,7 +90,7 @@ Copy_ch_file(const char *file, const char *tmpfile, regex_t *oldstring, char *ne
 		if (fstat(fdin, &tmpstate)) {
 			err_msg("%s\tfstat error:%s", file, strerror(errno));
 			if (fdin != STDIN_FILENO)
-				Close(fdin);
+				close(fdin);
 			return(1);
 		}
 	}
@@ -98,39 +100,39 @@ Copy_ch_file(const char *file, const char *tmpfile, regex_t *oldstring, char *ne
 		if ( (fdout = open(tmpfile, O_WRONLY|O_CREAT|O_TRUNC, PERM)) == -1) {
 			err_msg("%s\topen error:%s", tmpfile, strerror(errno));
 			if (fdin != STDIN_FILENO)
-				Close(fdin);
+				close(fdin);
 			return(1);
 		}
 
 		if (chmod(tmpfile, tmpstate.st_mode)) {
 			err_msg("%s\tchmod error:%s", tmpfile, strerror(errno));
 			if (fdin != STDIN_FILENO)
-				Close(fdin);
+				close(fdin);
 			if (fdout != STDOUT_FILENO)
-				Close(fdout);
+				close(fdout);
 			return(1);
 		}
 		if (chown(tmpfile, tmpstate.st_uid, tmpstate.st_gid)) {
 			err_msg("%s\tchown error:%s", tmpfile, strerror(errno));
 			if (fdin != STDIN_FILENO)
-				Close(fdin);
+				close(fdin);
 			if (fdout != STDOUT_FILENO)
-				Close(fdout);
+				close(fdout);
 			return(1);
 		}
 		if (fcntl(fdin, F_SETLK, &fl) == -1) {
 			err_msg("%s\tfcntl error:%s", file, strerror(errno));
 			if (fdin != STDIN_FILENO)
-				Close(fdin);
+				close(fdin);
 			if (fdout != STDOUT_FILENO)
-				Close(fdout);
+				close(fdout);
 			return(1);
 		} 
 	}
 	if (verbose)
-		Write(STDERR_FILENO, "\n", 1);
+		write(STDERR_FILENO, "\n", 1);
 
-	while ( (nwrite = nread = Read(fdin, buffin, BUFSIZ - 1)) != 0) {
+	while ( (nwrite = nread = read(fdin, buffin, BUFSIZ - 1)) != 0) {
 		buffin[nread] = '\0';
 		nwrote = 0;
 		if (verbose)
@@ -145,7 +147,7 @@ Copy_ch_file(const char *file, const char *tmpfile, regex_t *oldstring, char *ne
 			nwrote += buffintmp2 - buffintmp1;
 			nwrite -= buffintmp2 - buffintmp1;
 			if (nwrote > mem_al - BUFSIZ ) {
-				buffout = (char *) Realloc(buffout, mem_al + BUFSIZ);
+				buffout = (char *) realloc(buffout, mem_al + BUFSIZ);
 				mem_al += BUFSIZ;
 			}
 			memcpy(buffouttmp, buffintmp1, buffintmp2 - buffintmp1);
@@ -153,7 +155,7 @@ Copy_ch_file(const char *file, const char *tmpfile, regex_t *oldstring, char *ne
 			nwrote += size_newstring;
 			nwrite -= pmatch[0].rm_eo - pmatch[0].rm_so;
 			if (nwrote > mem_al - BUFSIZ ) {
-				buffout = (char *) Realloc(buffout, mem_al + BUFSIZ);
+				buffout = (char *) realloc(buffout, mem_al + BUFSIZ);
 				mem_al += BUFSIZ;
 			}
 			memcpy(buffouttmp, newstring, size_newstring);
@@ -168,11 +170,11 @@ Copy_ch_file(const char *file, const char *tmpfile, regex_t *oldstring, char *ne
 			err_msg("\tWrite: %d, Counter: %d", nwrote, counter);
 
 		if(simulation_mode)
-			Write(fdout, buffin, nread);
+			write(fdout, buffin, nread);
 		else
-			Write(fdout, buffout, nwrote);
+			write(fdout, buffout, nwrote);
 
-		buffout = (char *) Realloc(buffout, BUFSIZ * 5);
+		buffout = (char *) realloc(buffout, BUFSIZ * 5);
 		mem_al = BUFSIZ * 5;
 	}
 
@@ -180,21 +182,21 @@ Copy_ch_file(const char *file, const char *tmpfile, regex_t *oldstring, char *ne
 	if (fcntl(fdout, F_SETLK, &fl) == -1) {
 		err_msg("%s\tfcntl error:%s", tmpfile, strerror(errno));
 		if (fdin != STDIN_FILENO)
-			Close(fdin);
+			close(fdin);
 		if (fdout != STDOUT_FILENO)
-			Close(fdout);
+			close(fdout);
 		return(1);
 	} 
 
 	if (fdin != STDIN_FILENO)
-		Close(fdin);
+		close(fdin);
 
 	if (fdout != STDOUT_FILENO) {
-		Close(fdout);
+		close(fdout);
 		if(dont_ch_times) {
 			tmputime.actime = tmpstate.st_atime;
 			tmputime.modtime = tmpstate.st_mtime;
-			Utime(tmpfile, &tmputime);
+			utime(tmpfile, &tmputime);
 		}
 	}
 	
@@ -230,12 +232,12 @@ Copy_ch_file2(const char *file, const char *tmpfile, char *oldstring, char *news
 	size_oldstring = strlen(oldstring);
 
 	if(size_newstring == size_oldstring) {
-		buffin = (char *) Malloc(BUFSIZ);
-		buffout = (char *) Malloc(BUFSIZ);
+		buffin = (char *) malloc(BUFSIZ);
+		buffout = (char *) malloc(BUFSIZ);
 		mem_al = BUFSIZ;
 	} else {
-		buffin = (char *) Malloc(BUFSIZ);
-		buffout = (char *) Malloc(BUFSIZ * 5);
+		buffin = (char *) malloc(BUFSIZ);
+		buffout = (char *) malloc(BUFSIZ * 5);
 		mem_al = BUFSIZ * 5;
 	}
 
@@ -257,7 +259,7 @@ Copy_ch_file2(const char *file, const char *tmpfile, char *oldstring, char *news
 		if (fstat(fdin, &tmpstate)) {
 			err_msg("%s\tfstat error:%s", file, strerror(errno));
 			if (fdin != STDIN_FILENO)
-				Close(fdin);
+				close(fdin);
 			return(1);
 		}
 	}
@@ -267,40 +269,40 @@ Copy_ch_file2(const char *file, const char *tmpfile, char *oldstring, char *news
 		if ( (fdout = open(tmpfile, O_WRONLY|O_CREAT|O_TRUNC, PERM)) == -1) {
 			err_msg("%s\topen error:%s", tmpfile, strerror(errno));
 			if (fdin != STDIN_FILENO)
-				Close(fdin);
+				close(fdin);
 			return(1);
 		}
 
 		if (chmod(tmpfile, tmpstate.st_mode)) {
 			err_msg("%s\tchmod error:%s", tmpfile, strerror(errno));
 			if (fdin != STDIN_FILENO)
-				Close(fdin);
+				close(fdin);
 			if (fdout != STDOUT_FILENO)
-				Close(fdout);
+				close(fdout);
 			return(1);
 		}
 		if (chown(tmpfile, tmpstate.st_uid, tmpstate.st_gid)) {
 			err_msg("%s\tchown error:%s", tmpfile, strerror(errno));
 			if (fdin != STDIN_FILENO)
-				Close(fdin);
+				close(fdin);
 			if (fdout != STDOUT_FILENO)
-				Close(fdout);
+				close(fdout);
 			return(1);
 		}
 		if (fcntl(fdin, F_SETLK, &fl) == -1) {
 			err_msg("%s\tfcntl error:%s", file, strerror(errno));
 			if (fdin != STDIN_FILENO)
-				Close(fdin);
+				close(fdin);
 			if (fdout != STDOUT_FILENO)
-				Close(fdout);
+				close(fdout);
 			return(1);
 		} 
 	}
 
 	if (verbose)
-		Write(STDERR_FILENO, "\n", 1);
+		write(STDERR_FILENO, "\n", 1);
 
-        while ( (nwrite = nread = Read(fdin, buffin, BUFSIZ - 1)) != 0) {
+        while ( (nwrite = nread = read(fdin, buffin, BUFSIZ - 1)) != 0) {
                 buffin[nread] = '\0';
                 nwrote = 0;
                 if (verbose)
@@ -314,14 +316,14 @@ Copy_ch_file2(const char *file, const char *tmpfile, char *oldstring, char *news
                         nwrote += buffintmp2 - buffintmp1;
                         nwrite -= buffintmp2 - buffintmp1;
                         if ( (size_oldstring != size_newstring) && (nwrote > mem_al - BUFSIZ) ) {
-                                buffout = (char *) Realloc(buffout, mem_al + BUFSIZ);
+                                buffout = (char *) realloc(buffout, mem_al + BUFSIZ);
                                 mem_al += BUFSIZ;
                         }
                         memcpy(buffouttmp, buffintmp1, buffintmp2 - buffintmp1);                        buffouttmp += buffintmp2 - buffintmp1;
                         nwrote += size_newstring;
                         nwrite -= size_oldstring;
                         if ( (size_oldstring != size_newstring) && (nwrote > mem_al - BUFSIZ) ) {
-                                buffout = (char *) Realloc(buffout, mem_al + BUFSIZ);
+                                buffout = (char *) realloc(buffout, mem_al + BUFSIZ);
                                 mem_al += BUFSIZ;
                         }
                         memcpy(buffouttmp, newstring, size_newstring);
@@ -336,12 +338,12 @@ Copy_ch_file2(const char *file, const char *tmpfile, char *oldstring, char *news
                         err_msg("\tWrite: %d, Counter: %d", nwrote, counter);
 
 		if(simulation_mode)
-                	Write(fdout, buffin, nread);
+                        write(fdout, buffin, nread);
 		else
-                	Write(fdout, buffout, nwrote);
+                        write(fdout, buffout, nwrote);
 
 		if (size_oldstring != size_newstring) {
-                	buffout = (char *) Realloc(buffout, BUFSIZ * 5);
+                        buffout = (char *) realloc(buffout, BUFSIZ * 5);
                 	mem_al = BUFSIZ * 5;
 		}
         }
@@ -350,21 +352,21 @@ Copy_ch_file2(const char *file, const char *tmpfile, char *oldstring, char *news
 	if (fcntl(fdout, F_SETLK, &fl) == -1) {
 		err_msg("%s\tfcntl error:%s", tmpfile, strerror(errno));
 		if (fdin != STDIN_FILENO)
-			Close(fdin);
+			close(fdin);
 		if (fdout != STDOUT_FILENO)
-			Close(fdout);
+			close(fdout);
 		return(1);
 	} 
 
 	if (fdin != STDIN_FILENO)
-		Close(fdin);
+		close(fdin);
 
 	if (fdout != STDOUT_FILENO) {
-		Close(fdout);
+		close(fdout);
 		if(dont_ch_times) {
 			tmputime.actime = tmpstate.st_atime;
 			tmputime.modtime = tmpstate.st_mtime;
-			Utime(tmpfile, &tmputime);
+			utime(tmpfile, &tmputime);
 		}
 	}
 	
@@ -399,30 +401,30 @@ list(const char *name, const struct stat *status, int type)
 	strcat(strcpy(tmpfile, name), ".lock");
 
 	if ( (fdout = open(tmpfile, O_RDONLY, PERM)) != -1) {
-		Close(fdout);
+		close(fdout);
 		tmpfile[strlen(tmpfile)-5] = '\0';
 		err_msg("%s\tfile didn't change! %s.lock exists. Try later!", tmpfile, tmpfile);
 		return 0;
 	}
 
-	Rename(name, tmpfile);
+	rename(name, tmpfile);
 
 	if(! quiet_mode)
-		Write(STDOUT_FILENO, (char *) name, strlen(name));
+		write(STDOUT_FILENO, (char *) name, strlen(name));
 
 	if (withoutregexp) {
 		if (Copy_ch_file2(tmpfile, name, oldstr2, newstr))
-			Rename(tmpfile, name);
+			rename(tmpfile, name);
 	} else {
 		if (Copy_ch_file(tmpfile, name, oldstr, newstr))
-			Rename(tmpfile, name);
+			rename(tmpfile, name);
 	}
 
 	if(! quiet_mode)
-		Write(STDOUT_FILENO, "\n", 1);
+		write(STDOUT_FILENO, "\n", 1);
 
  	if(losttmp)
-		Unlink(tmpfile);
+		unlink(tmpfile);
 	
 	return 0;
 
@@ -462,7 +464,7 @@ void
 chg_quit(int signal)
 {
 	if (file_quit != NULL && tmpfile_quit != NULL)
-		Rename(tmpfile_quit, file_quit);
+		rename(tmpfile_quit, file_quit);
 
 	err_quit(" recovered\nOperation stopped. You pressed Ctrl-C or received SIGINT.");
 

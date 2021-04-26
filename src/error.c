@@ -21,6 +21,8 @@
 #include	<stdarg.h>
 #include	<syslog.h>
 #include	<errno.h>
+#include	<stdlib.h>
+#include	<string.h>
 
 #define		MAXLINE	4096
 

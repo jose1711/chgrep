@@ -37,7 +37,8 @@
 #include	"error.h"
 #include	"wrappers.h"
 #include	"functions.h"
-
+#include	"ftw.h"
+#include	<stdlib.h>
 
 #define		MAXLINE	4096
 #define		PERM	0666
@@ -157,7 +158,7 @@ main(int argc, char **argv)
 
 	if ( (argc-optind) == 2) {	/* From STDIN to STDOUT */
 		if (verbose)
-			Write(STDOUT_FILENO, "STDIN\n", 6);
+			write(STDOUT_FILENO, "STDIN\n", 6);
 
 		if(withoutregexp)
 			Copy_ch_file2("stdin", "stdout", oldstr2, newstr);
@@ -165,7 +166,7 @@ main(int argc, char **argv)
 			Copy_ch_file("stdin", "stdout", &re_old, newstr);
 
 		if (verbose)
-			Write(STDOUT_FILENO, "\n", 1);
+			write(STDOUT_FILENO, "\n", 1);
 
 		return 0;
 	}
@@ -176,7 +177,7 @@ main(int argc, char **argv)
 		tmpfile_quit = NULL;
 
 		if (recursive) {
-			ftw(argv[opttmp], list, sysconf(_SC_OPEN_MAX));
+			ftw(argv[opttmp], (__ftw_func_t) list, sysconf(_SC_OPEN_MAX));
 			return 0;
 		}
 
@@ -208,7 +209,7 @@ main(int argc, char **argv)
 
 		Rename(argv[opttmp], tmpfile);
 		if(! quiet_mode)
-			Write(STDOUT_FILENO, argv[opttmp], strlen(argv[opttmp]));
+			write(STDOUT_FILENO, argv[opttmp], strlen(argv[opttmp]));
 
 		if(withoutregexp) {
 			if (Copy_ch_file2(tmpfile, argv[opttmp], oldstr2, newstr))
@@ -219,10 +220,10 @@ main(int argc, char **argv)
 		}
 
 		if(! quiet_mode)
-			Write(STDOUT_FILENO, "\n", 1);
+			write(STDOUT_FILENO, "\n", 1);
 
 		if(losttmp)
-			Unlink(tmpfile);
+			unlink(tmpfile);
 
 		opttmp++;
 	}
