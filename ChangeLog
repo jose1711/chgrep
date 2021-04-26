@@ -1,0 +1,33 @@
+chgrep-1.2.4
+	-added  options:
+	  -d   Don't change modification times of altered files,
+	  -q   Quiet mode (no output at all),
+	  -s   Simulation mode.
+
+chgrep-1.2.3
+	-added -w option: doesn't recognize regexp in OLDPATTERN. This option
+         accelerates the whole process. Incompatible with -e and/or -n.
+
+chgrep-1.2.2
+	-BUG "Segmentation fault" fixed.
+
+chgrep-1.2.1
+	-Binary data service,
+	-option -v shows loops numbers and datasize to read and write.
+
+chgrep-1.2.0
+        -BUG "Segmentation fault" at -r option fixed.
+
+chgrep-1.1.1
+        -BUG -r (recursively) fixed.
+        -You can use "NULL" as [NEWPATTERN] to clear [OLDPATTERN], i.e.:
+                chgrep oldstring NULL somefile.c
+
+chgrep-1.1.0
+        -You can use regular expressions in [OLDPATTERN],
+        -options:
+                -i Ignore differences in case at [OLDPATTERN],
+                -n Treat [newline] as a regular character.
+
+chgrep-1.0.0
+        Copyright (C) 2002  Bartosz M. Krajnik <bartek@bicom.pl>

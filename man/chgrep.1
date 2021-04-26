@@ -1,0 +1,97 @@
+.\" chgrep man page
+.if !\n(.g \{\
+.	if !\w|\*(lq| \{\
+.		ds lq ``
+.		if \w'\(lq' .ds lq "\(lq
+.	\}
+.	if !\w|\*(rq| \{\
+.		ds rq ''
+.		if \w'\(rq' .ds rq "\(rq
+.	\}
+.\}
+.de Id
+.ds Dt \\$4
+..
+.Id $Id: chgrep.1,v 1.0 2002/04/16 20:41:01 bartekk Exp $
+.TH CHGREP 1 \*(Dt "Project"
+.SH NAME
+chgrep \- change oldpattern to newpattern
+.SH SYNOPSIS
+.B chgrep
+.RB [ \-en/w ]
+.RB [ \-dhilqrsv ]
+.RB [ \-t\ filename]
+.RB OLDPATTERN
+.RB NEWPATTERN
+.RI [ file .\|.\|.]
+.SH DESCRIPTION
+.PP
+.B Chgrep
+searches the input
+.B files
+(or standard input if no files are named)
+for oldstring and changes them to newstring. If some
+.B file
+and
+.B file.lock
+exist then
+.B chgrep
+leaves both files unchanged. You can write NEWPATTERN
+as "NULL" to clear OLDPATTERN, i.e.
+"chgrep oldstring NULL somefile.c".
+.PP
+.TP
+.BR \-d
+Don't change modification times of altered files.
+.TP
+.BR \-e
+Extended-regexp.
+.TP
+.BR \-h
+Print the version number of
+.B chgrep
+to standard output.  This version number should
+be included in all bug reports (see below).
+.TP
+.BR \-i
+Ignore differences in case at OLDPATTERN.
+.TP
+.BR \-l
+Leaves copy of old file unchanged in filename.lock
+.TP
+.BR \-n
+Treat <newline> as a regular character.
+.TP
+.BR \-q
+Quiet mode (no output at all).
+.TP
+.BR \-r
+Read all files under each subdirectory, recursively.
+.TP
+.BR \-s
+Simulation mode.
+.TP
+.BR \-t
+Use not default file.lock for caching.
+.TP
+.BR \-v
+Prints to standard output diagnostic informations.
+.TP
+.BR \-w
+Doesn't recognize regexp in OLDPATTERN. This option
+accelerates the whole process. Incompatible with \-e
+and/or \-n.
+.SH DIAGNOSTICS
+.PP
+Normally, exit status is 0 if no errors were found,
+and 1 if some errors were found. The
+.B \-v
+option helps to understand the sense of the exit status.
+.SH BUGS
+.PP
+Email bug reports to
+.BR bartek@bmk.bz .
+Be sure to include the word \*(lqchgrep\*(rq somewhere in the
+\*(lqSubject:\*(rq field.
+.\" Work around problems with some troff -man implementations.
+.BR

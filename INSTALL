@@ -1,0 +1,55 @@
+
+			GENERAL INFORMATION
+			
+
+The newest version of the program is available under:
+	http://www.bicom.pl/bartek/chgrep-current.tgz
+	ftp://ftp.bicom.pl/pub/chgrep-current.tgz
+
+Homepage:
+	http://www.bmk.bicom.pl/chgrep
+
+Any suggestions, bug reports, information about successful ports should go to:
+	Bartosz Maciej Krajnik <bmk@bicom.pl>
+
+
+
+			    INSTALLING
+
+Consult INSTALL file for generic instructions about installing.
+
+Simple installation process could look like this:
+$ ./configure
+$ make
+# make install
+
+Before "make install" you can use "make strip" like there:
+$ ./configure
+$ make
+$ make strip
+# make install
+
+
+			      NOTES
+
+This program was tested on:
+  Linux Debian 2.2
+  Linux Debian 3.0
+  Linux RedHat 7.3
+  Linux RedHat 9.0
+  NetBSD 1.5
+  OpenBSD 3.2
+  FreeBSD 4.9
+
+Probably on the most UNIX systems shouldn't be any problems. If so, write
+ to me: <bartek@bmk.bz>. Be sure to include the word "chgrep" somewhere
+ in the "Subject:" field.
+
+			    COPYRIGHT
+
+The program is distributed under GNU General Public License.
+See the file COPYING for details.
+
+
+
+				    Bartek Krajnik <bartek@bmk.bz>
